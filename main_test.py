@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 import torch
 from lib.options import BaseOptions
 from lib.options2 import BaseOptions as BaseOptions2
@@ -12,9 +12,9 @@ from Constants import consts
 from lib.model2 import HGPIFuNet as SemanticNet
 import torchvision.transforms as transforms
 
-
 opt = BaseOptions().parse()
 opt2 = BaseOptions2().parse()
+
 
 def rotateY_by_view(view_id):
     """
@@ -29,19 +29,20 @@ def rotateY_by_view(view_id):
     ry = np.transpose(ry)
 
     return ry
+
+
 to_tensor = transforms.Compose([
-            transforms.Resize(opt.loadSize),  # 512 , 512
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ])
+    transforms.Resize(opt.loadSize),  # 512 , 512
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
 
 
-
-def main(opt):
-    image_path = 'demo/1.png'  # input image
-    image_mask_path = 'demo/1_mask.png'  # The mask corresponding to the picture
-    normal_path = 'demo/1_normal.png'  # image normal
-    save_file = 'demo/1.obj'  # final result path
+def main(opt, path):
+    image_path = path + '.png'  # input image
+    image_mask_path = path + '_mask.png'
+    normal_path = path + '_normal.png'
+    save_file = path + '.obj'
 
     # load data path
     cuda = torch.device('cuda') if len(opt.gpu_ids) > 1 else torch.device('cuda:%d' % opt.gpu_id)
@@ -51,6 +52,7 @@ def main(opt):
         # load model only once time is ok!
         netG_SeIF = HGPIFuNet(opt, projection_mode)
         netG_SeIF.to(cuda)
+
         netG_Semantic = SemanticNet(opt2, projection_mode)
         netG_Semantic.to(cuda)
 
@@ -165,7 +167,10 @@ def main(opt):
                         'mask': torch.stack(mask_list, dim=0)
                         }
                 # every time we do a new encoder photo! and we get a net image feature!
-                gen_mesh(opt, netG_SeIF.module if len(opt.gpu_ids) > 1 else netG_SeIF, netG_Semantic, cuda, data, save_path)
+                gen_mesh(opt, netG_SeIF.module if len(opt.gpu_ids) > 1 else netG_SeIF, netG_Semantic, cuda, data,
+                         save_path)
+
 
 if __name__ == '__main__':
-    main(opt)
+    for i in range(1, 17):
+        main(opt, 'demo/{}'.format(i))

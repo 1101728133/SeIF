@@ -5,22 +5,23 @@ from data.NormalNet import NormalNet
 import torchvision.transforms as transforms
 from PIL import Image
 from train_Normal.lib.model.options import BaseOptions
+
 opt = BaseOptions().parse()
 
 to_tensor = transforms.Compose([
-            transforms.Resize(opt.loadSize),
-            transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ])
+    transforms.Resize(opt.loadSize),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
 
 cuda = torch.device('cuda:%d' % opt.gpu_id)
 
-def main(opt):
-    #  input img, mask; and we can get normal_image of input_image
-    image_path = '/media/lx/4A42-E0B2/code_github/SePIFU_08_15into/demo_result/2.png'
-    mask_path = '/media/lx/4A42-E0B2/code_github/SePIFU_08_15into/demo_result/2_mask.png'
-    save_path = '/media/lx/4A42-E0B2/code_github/SePIFU_08_15into/demo_result/2_normal.png'
 
+def main(opt,path):
+    #  input img, mask; and we can get normal_image of input_image
+    image_path = path+'.png'
+    mask_path = path+'_mask.png'
+    save_path = path+'_normal.png'
 
     render = {}
     render_list = []
@@ -61,7 +62,7 @@ def main(opt):
         netG = NormalNet(opt)
         netG.to(cuda)
         # 2023/05/06 we get the 27_1984
-        model_path = '/media/lx/4A42-E0B2/code_github/SePIFU_08_15into/checkpoints/model_Normal-Net/Train_Normal_epoch_27_1984'
+        model_path = 'Train_Normal_epoch_27_1984'
         netG.load_state_dict(torch.load(model_path, map_location=cuda))
         netG.eval()
         # the return is a normal image!
@@ -83,11 +84,5 @@ def main(opt):
 
 
 if __name__ == '__main__':
-    main(opt)
-
-
-
-
-
-
-
+    for i in range(1, 17):
+        main(opt, '../demo/{}'.format(i))
