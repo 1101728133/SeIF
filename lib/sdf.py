@@ -112,8 +112,8 @@ def eval_grid_octree(coords, eval_func, init_resolution=64, threshold=0.01, num_
     sdf = np.zeros(resolution) # XYZ, WHD, (256, 256, 256)
 
     # for octree processing
-    dirty     = np.ones(resolution, dtype=np.bool)  # mark voxels that have been tested so far, by False
-    grid_mask = np.zeros(resolution, dtype=np.bool) # mark voxels to be tested in this iteration, by True
+    dirty     = np.ones(resolution, dtype=np.bool_)  # mark voxels that have been tested so far, by False
+    grid_mask = np.zeros(resolution, dtype=np.bool_) # mark voxels to be tested in this iteration, by True
 
     # initial-resolution-scales wrt the-raw-resolution
     reso = resolution[0] // init_resolution # default: 4
